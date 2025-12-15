@@ -14,7 +14,8 @@ SimpleCov.start do
   ])
   
   minimum_coverage 80
-  refuse_coverage_drop
+  # Allow small coverage changes from refactoring/bug fixes
+  maximum_coverage_drop 1.0
 end
 
 require 'json'

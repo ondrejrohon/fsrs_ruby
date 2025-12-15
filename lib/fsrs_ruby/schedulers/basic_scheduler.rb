@@ -91,7 +91,7 @@ module FsrsRuby
 
         to_state = @current.state == State::RELEARNING ? State::RELEARNING : State::LEARNING
 
-        if grade == Rating::AGAIN || grade == Rating::HARD
+        if [Rating::AGAIN, Rating::HARD].include?(grade)
           to_state = @current.state == State::RELEARNING ? State::RELEARNING : State::LEARNING
         end
 
@@ -149,7 +149,7 @@ module FsrsRuby
               Rating::GOOD
             )
             good_interval = @algorithm.next_interval(good_state[:stability], interval)
-            
+
             easy_state = @algorithm.next_state(
               { difficulty: @last.difficulty, stability: @last.stability },
               interval,

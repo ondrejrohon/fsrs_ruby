@@ -89,5 +89,122 @@ RSpec.describe 'FsrsRuby Helpers' do
       expect(result2.card.scheduled_days).to be > 0
     end
   end
+
+  describe 'Helpers module' do
+    describe '.round8' do
+      it 'rounds to 8 decimal places' do
+        result = FsrsRuby::Helpers.round8(1.123456789)
+        expect(result).to eq(1.12345679)
+      end
+
+      it 'returns nil for nil input' do
+        result = FsrsRuby::Helpers.round8(nil)
+        expect(result).to be_nil
+      end
+    end
+
+    describe '.clamp' do
+      it 'clamps value to maximum' do
+        result = FsrsRuby::Helpers.clamp(100, 0, 50)
+        expect(result).to eq(50)
+      end
+
+      it 'clamps value to minimum' do
+        result = FsrsRuby::Helpers.clamp(-10, 0, 50)
+        expect(result).to eq(0)
+      end
+
+      it 'returns value if within range' do
+        result = FsrsRuby::Helpers.clamp(25, 0, 50)
+        expect(result).to eq(25)
+      end
+    end
+
+    describe '.date_diff' do
+      it 'calculates difference in days' do
+        now = Time.parse('2024-01-10T00:00:00Z')
+        pre = Time.parse('2024-01-05T00:00:00Z')
+        
+        result = FsrsRuby::Helpers.date_diff(now, pre, :days)
+        expect(result).to eq(5)
+      end
+
+      it 'calculates difference in minutes' do
+        now = Time.parse('2024-01-01T01:00:00Z')
+        pre = Time.parse('2024-01-01T00:00:00Z')
+        
+        result = FsrsRuby::Helpers.date_diff(now, pre, :minutes)
+        expect(result).to eq(60)
+      end
+
+      it 'raises error for invalid unit' do
+        now = Time.now
+        pre = Time.now - 3600
+        
+        expect {
+          FsrsRuby::Helpers.date_diff(now, pre, :hours)
+        }.to raise_error(ArgumentError, /Invalid unit/)
+      end
+    end
+
+    describe '.get_fuzz_range' do
+      it 'handles small intervals' do
+        result = FsrsRuby::Helpers.get_fuzz_range(2.0, 0, 36500)
+        expect(result[:min_ivl]).to eq(2)
+        expect(result[:max_ivl]).to be >= result[:min_ivl]
+      end
+
+      it 'handles medium intervals (2.5-7)' do
+        result = FsrsRuby::Helpers.get_fuzz_range(5.0, 0, 36500)
+        expect(result[:min_ivl]).to be >= 2
+        expect(result[:max_ivl]).to be > result[:min_ivl]
+      end
+
+      it 'handles intervals >= 7 and < 20' do
+        result = FsrsRuby::Helpers.get_fuzz_range(10.0, 0, 36500)
+        expect(result[:min_ivl]).to be >= 2
+        expect(result[:max_ivl]).to be > result[:min_ivl]
+      end
+
+      it 'handles intervals >= 20' do
+        result = FsrsRuby::Helpers.get_fuzz_range(30.0, 0, 36500)
+        expect(result[:min_ivl]).to be >= 2
+        expect(result[:max_ivl]).to be > result[:min_ivl]
+      end
+
+      it 'respects maximum interval' do
+        result = FsrsRuby::Helpers.get_fuzz_range(100.0, 0, 50)
+        expect(result[:max_ivl]).to eq(50)
+      end
+
+      it 'ensures min_ivl > elapsed_days when interval exceeds it' do
+        result = FsrsRuby::Helpers.get_fuzz_range(10.0, 8, 36500)
+        expect(result[:min_ivl]).to be > 8
+      end
+
+      it 'ensures min_ivl <= max_ivl' do
+        result = FsrsRuby::Helpers.get_fuzz_range(50.0, 49, 51)
+        expect(result[:min_ivl]).to be <= result[:max_ivl]
+      end
+    end
+
+    describe '.format_date' do
+      it 'formats time as YYYY-MM-DD HH:MM:SS' do
+        time = Time.parse('2024-01-15T12:30:45Z')
+        result = FsrsRuby::Helpers.format_date(time)
+        expect(result).to match(/2024-01-15 \d{2}:\d{2}:\d{2}/)
+      end
+    end
+
+    describe '.date_diff_in_days' do
+      it 'calculates day difference ignoring time' do
+        last = Time.parse('2024-01-01T23:59:59Z')
+        cur = Time.parse('2024-01-05T00:00:01Z')
+        
+        result = FsrsRuby::Helpers.date_diff_in_days(last, cur)
+        expect(result).to eq(4)
+      end
+    end
+  end
 end
 

@@ -1,0 +1,53 @@
+# frozen_string_literal: true
+
+RSpec.describe FsrsRuby::Strategies do
+  describe '.default_init_seed_strategy' do
+    it 'generates seed from review time and card properties' do
+      now = Time.parse('2024-01-15T12:00:00Z')
+      card = FsrsRuby::Card.new(
+        due: now,
+        reps: 5,
+        difficulty: 2.5,
+        stability: 10.0
+      )
+
+      fsrs = FsrsRuby.new
+      scheduler = fsrs.send(:get_scheduler, card, now)
+
+      seed = described_class.default_init_seed_strategy(scheduler)
+
+      expect(seed).to be_a(String)
+      expect(seed).to include(now.to_i.to_s)
+      expect(seed).to include('6') # reps (incremented by scheduler)
+      # Should include multiplication of difficulty and stability
+      mul = (2.5 * 10.0).round(2)
+      expect(seed).to include(mul.to_s)
+    end
+  end
+
+  describe '.gen_seed_strategy_with_card_id' do
+    it 'generates seed strategy proc' do
+      strategy = described_class.gen_seed_strategy_with_card_id(:custom_field)
+
+      expect(strategy).to be_a(Proc)
+      expect(strategy).to respond_to(:call)
+    end
+
+    it 'generates seed from card ID field' do
+      # Create a mock scheduler with a card that responds to the field
+      mock_card = FsrsRuby::Card.new(due: Time.now, reps: 5)
+
+      # Add custom field to the mock card
+      def mock_card.card_id
+        'test_card_123'
+      end
+
+      mock_scheduler = double('Scheduler', current: mock_card)
+
+      strategy = described_class.gen_seed_strategy_with_card_id(:card_id)
+      seed = strategy.call(mock_scheduler)
+
+      expect(seed).to eq('test_card_1235')
+    end
+  end
+end

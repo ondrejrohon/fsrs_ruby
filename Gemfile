@@ -9,4 +9,7 @@ group :development, :test do
   gem 'rspec', '~> 3.12'
   gem 'simplecov', '~> 0.22', require: false
   gem 'simplecov-console', require: false
+  gem 'rubocop', '~> 1.50', require: false
+  gem 'rubocop-rspec', '~> 2.20', require: false
+  gem 'rubocop-performance', '~> 1.17', require: false
 end

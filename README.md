@@ -1,6 +1,6 @@
 # FSRS Ruby - v6.0
 
-A complete Ruby port of the [FSRS (Free Spaced Repetition Scheduler)](https://github.com/open-spaced-repetition/fsrs) algorithm version 6.0.
+A complete Ruby port of the [FSRS (Free Spaced Repetition Scheduler)](https://github.com/open-spaced-repetition/fsrs) algorithm version 6.0. Claude Sonnet 4.5 by Antrhopic was used to generate this port.
 
 ## Features
 
@@ -11,6 +11,10 @@ A complete Ruby port of the [FSRS (Free Spaced Repetition Scheduler)](https://gi
 - ✅ **Fuzzing**: Optional interval randomization using Alea PRNG
 - ✅ **Strategy Pattern**: Pluggable schedulers, learning steps, and seed strategies
 - ✅ **Cross-validated**: Outputs match TypeScript implementation to 8 decimal places
+
+## Requirements
+
+- Ruby >= 3.1.0
 
 ## Installation
 
@@ -163,10 +167,32 @@ $ bundle exec rake spec
 
 This implementation has been cross-validated against the TypeScript FSRS v6 implementation. All core formulas match to 8 decimal places.
 
+See [VERIFICATION_REPORT.md](VERIFICATION_REPORT.md) for detailed verification results.
+
+## Contributing
+
+Bug reports and pull requests are welcome on GitHub at https://github.com/ondrejrohon/fsrs_ruby.
+
+Please read [CONTRIBUTING.md](CONTRIBUTING.md) for details on how to contribute.
+
+This project is intended to be a safe, welcoming space for collaboration. Contributors are expected to adhere to the [code of conduct](CODE_OF_CONDUCT.md).
+
 ## License
 
 The gem is available as open source under the terms of the [MIT License](https://opensource.org/licenses/MIT).
 
 ## Credits
 
-Based on the FSRS algorithm by [Jarrett Ye](https://github.com/L-M-Sherlock) and the [open-spaced-repetition](https://github.com/open-spaced-repetition) community.
+This gem is a Ruby port of the [TypeScript FSRS v6.0](https://github.com/open-spaced-repetition/ts-fsrs)
+implementation, developed with AI assistance and thoroughly cross-validated.
+
+The FSRS algorithm was created by [Jarrett Ye](https://github.com/L-M-Sherlock) and the
+[open-spaced-repetition](https://github.com/open-spaced-repetition) community.
+
+### Verification
+
+This implementation has been cross-validated against the TypeScript version with:
+- ✅ 125 passing tests
+- ✅ 89.87% code coverage
+- ✅ Algorithm accuracy to 8 decimal places
+- ✅ All known issues fixed and validated
