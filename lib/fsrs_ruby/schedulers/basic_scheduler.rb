@@ -124,25 +124,42 @@ module FsrsRuby
           next_card.state = State::REVIEW
           next_card.learning_steps = 0
 
-          hard_interval = @algorithm.next_interval(next_card.stability, interval)
-          good_interval = hard_interval
-          easy_interval = hard_interval
+          # Calculate stability for HARD rating to get correct hard_interval
+          hard_state = @algorithm.next_state(
+            { difficulty: @last.difficulty, stability: @last.stability },
+            interval,
+            Rating::HARD
+          )
+          hard_interval = @algorithm.next_interval(hard_state[:stability], interval)
 
           # Calculate different intervals for each grade
           if grade == Rating::HARD
             next_card.scheduled_days = hard_interval
           elsif grade == Rating::GOOD
             good_interval = @algorithm.next_interval(next_card.stability, interval)
-            good_interval = [good_interval, hard_interval + 1].max
+            # Only enforce ordering if intervals would violate it and we're not at max_interval
+            if good_interval <= hard_interval && hard_interval < @algorithm.parameters.maximum_interval
+              good_interval = [good_interval, hard_interval + 1].max
+            end
             next_card.scheduled_days = good_interval
           else # EASY
+            good_state = @algorithm.next_state(
+              { difficulty: @last.difficulty, stability: @last.stability },
+              interval,
+              Rating::GOOD
+            )
+            good_interval = @algorithm.next_interval(good_state[:stability], interval)
+            
             easy_state = @algorithm.next_state(
               { difficulty: @last.difficulty, stability: @last.stability },
               interval,
               Rating::EASY
             )
             easy_interval = @algorithm.next_interval(easy_state[:stability], interval)
-            easy_interval = [easy_interval, good_interval + 1].max
+            # Only enforce ordering if intervals would violate it and we're not at max_interval
+            if easy_interval <= good_interval && good_interval < @algorithm.parameters.maximum_interval
+              easy_interval = [easy_interval, good_interval + 1].max
+            end
             next_card.scheduled_days = easy_interval
           end
 

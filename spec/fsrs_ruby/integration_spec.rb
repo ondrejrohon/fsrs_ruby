@@ -86,10 +86,8 @@ RSpec.describe 'FSRS v6 Cross-Validation' do
         expect(result.card.stability).to be_close_to_ts(ts_output['stability'])
         expect(result.card.state).to eq(ts_output['state'])
         expect(result.card.reps).to eq(ts_output['reps'])
-        # Note: elapsed_days is calculated at review time, not stored on card
-        # The fixture shows what WILL be logged, not what's on the card yet
-        # Allow 1 day tolerance for potential rounding differences
-        expect(result.card.scheduled_days).to be_within(1).of(ts_output['scheduled_days'])
+        # Now that interval calculation is fixed, expect exact match
+        expect(result.card.scheduled_days).to eq(ts_output['scheduled_days'])
         
         # Check the review log for elapsed_days
         ts_log = review['output']['log']
